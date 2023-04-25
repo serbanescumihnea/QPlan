@@ -1,0 +1,21 @@
+@import "tailwindcss/base";
+
+@import "tailwindcss/components";
+
+@import "tailwindcss/utilities";
+
+@font-face {
+  font-family:TitleFont;
+  src:url(Roboto-Regular.ttf);
+}
+@font-face {
+  font-family:BodyFont;
+  src:url(Roboto-Light.ttf);
+}
+.titleFont{
+  font-family: TitleFont;
+}
+body{
+  font-family: BodyFont;
+}
+
