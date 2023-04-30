@@ -10,11 +10,14 @@ export type Channels = 'ipc-example';
 contextBridge.exposeInMainWorld('electron',{
   getGithub: async () => ipcRenderer.invoke('get:github'),
   postGithub: async (id:any) => ipcRenderer.invoke('post:github',id),
+  addIssues:async(...args: any)=>ipcRenderer.invoke('add:issues',...args),
   getProjects: async () => ipcRenderer.invoke('get:projects'),
   postProjects:async(title: any,description: any)=>ipcRenderer.invoke('post:projects',title,description),
-  getTasks: async () => ipcRenderer.invoke('get:tasks'),
-  postTasks:async(title: any,description: any,priority: any,project: any)=>ipcRenderer.invoke('post:tasks',title,description,priority,project),
+  getTasks: async (labelName:string) => ipcRenderer.invoke('get:tasks',labelName),
+  postTasks:async(title: any,description: any,priority: any,project: any,labelName:any)=>ipcRenderer.invoke('post:tasks',title,description,priority,project,labelName),
   updateTasks:async(id:number,title: any,description: any,status: any)=>ipcRenderer.invoke('update:tasks',id,title,description,status),
+  deleteTask:async(id:number)=>ipcRenderer.invoke('delete:tasks',id),
+  deleteAllData:async()=>ipcRenderer.invoke('delete:all'),
   ipcRenderer: {
     sendMessage(channel: Channels, args: unknown[]) {
       ipcRenderer.send(channel, args);
