@@ -1,8 +1,8 @@
 {
   "name": "qplan",
-  "appName": "qplan",
-  "description": "A foundation for scalable desktop apps",
-  "productName": "qplan",
+  "appName": "QPlan",
+  "description": "A task planning app made as a final year project.",
+  "productName": "QPlan",
   "keywords": [
     "planner",
     "qplan",
@@ -167,8 +167,8 @@
     "webpack-merge": "^5.8.0"
   },
   "build": {
-    "productName": "qplan",
-    "appId": "org.erb.qplan",
+    "productName": "QPlan",
+    "appId": "org.erb.QPlan",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [

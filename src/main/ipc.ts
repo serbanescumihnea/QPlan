@@ -9,7 +9,7 @@ const init = () => {
   if (!fs.existsSync(`${app.getPath('appData')}/qplan/data/config.json`)) {
     fs.writeFileSync(
       `${app.getPath('appData')}/qplan/data/config.json`,
-      '{ "github_username":""}'
+      '{ "github_username":"-1"}'
     );
   }
   if (!fs.existsSync(`${app.getPath('appData')}/qplan/data/projects.json`)) {

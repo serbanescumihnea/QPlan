@@ -75,6 +75,7 @@ const createWindow = async () => {
   };
   console.log(__dirname);
   mainWindow = new BrowserWindow({
+    autoHideMenuBar:true,
     show: false,
     width: 1024,
     height: 728,
