@@ -35,7 +35,6 @@ const init = () => {
     parsed.forEach(element => {
 
       if(element.project===args[0]){
-        console.log(element.labels);
         returnData = element;
       }
     });
