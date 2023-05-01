@@ -2,7 +2,7 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import icon from '../../assets/icon.svg';
 import { Octokit } from '@octokit/core';
 import './App.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 import { Task } from '../components/task';
 import { Group } from 'components/group';
@@ -42,6 +42,8 @@ export default function Tasks(props: any) {
   const [input, setInput] = useState(null);
   const [fetchedTasks,setFetchedTasks] = useState([]);
   const [githubLoaded,setGithubLoaded] = useState(false);
+  const [labels, setLabels] = useState([]);
+  const newLabelName = useRef();
   const { data, error, isLoading } = useSWR(
     props.username ? `https://api.github.com/repos/${props.username}/${props.project}/issues` : null,
     fetcher
@@ -53,8 +55,26 @@ export default function Tasks(props: any) {
    setCurrentTasks(task);
   };
 
-  const addGithubIssues = async ()=>{
+  const fetchLabels = async () =>{
+    setLabels([]);
+    const taskLabels = await window.electron.getLabels(props.project);
+    if(taskLabels!=undefined)
+      setLabels(taskLabels.labels);
+  }
+  const addLabel = async()=>{
+    if(newLabelName!=undefined){
+      const addTaskLabels = await window.electron.postLabels(props.project,newLabelName.current.value);
+      fetchLabels();
+    }
+  }
 
+  const handleKeyDown = (event)=>{
+    if(event.key==="Enter"){
+      addLabel();
+    }
+  }
+
+  const addGithubIssues = async ()=>{
       const sendIssues = await window.electron.addIssues(props.project,data);
       setGithubLoaded(!githubLoaded);
   }
@@ -72,6 +92,7 @@ export default function Tasks(props: any) {
   };
   useEffect(() => {
     fetchTasks();
+    fetchLabels();
     setFetchedTasks(data);
   }, []);
   if(!isLoading)
@@ -153,43 +174,19 @@ export default function Tasks(props: any) {
           <p className="text-gray-600">{props.project}</p>
         </div>
 
-        <div className="grid grid-cols-3  h-fit  mt-10 ml-10 mr-10 gap-24">
+        <div className="grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-3 h-fit  mt-10 ml-10 mr-10 gap-24">
         <Group loaded={githubLoaded} project={props.project} labelName='UNLABELED' />
-        <Group loaded={githubLoaded} project={props.project} labelName='UNLABELED' />
-        <Group loaded={githubLoaded} project={props.project} labelName='UNLABELED' />
-        <Group loaded={githubLoaded} project={props.project} labelName='UNLABELED' />
-        <Group loaded={true} project={props.project} labelName='Test' />
+          {labels && labels.map((object)=>{
+             return <Group loaded={true} project={props.project} labelName={object} />
+          })}
 
 
-          <div className='rounded-lg bg-gray-400 h-12 flex stroke-gray-500 '>
-            <input className='bg-gray-300 py-1 px-3 placeholder-black  ' placeholder='New label title...'/>
-            <svg
-                  className="w-full"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <g id="SVGRepo_bgCarrier" strokeWidth="0" />
-                  <g
-                    id="SVGRepo_tracerCarrier"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <g id="SVGRepo_iconCarrier">
-                    {' '}
-                    <g id="Edit / Add_Plus_Square">
-                      {' '}
-                      <path
-                        id="Vector"
-                        d="M8 12H12M12 12H16M12 12V16M12 12V8M4 16.8002V7.2002C4 6.08009 4 5.51962 4.21799 5.0918C4.40973 4.71547 4.71547 4.40973 5.0918 4.21799C5.51962 4 6.08009 4 7.2002 4H16.8002C17.9203 4 18.4801 4 18.9079 4.21799C19.2842 4.40973 19.5905 4.71547 19.7822 5.0918C20.0002 5.51962 20.0002 6.07967 20.0002 7.19978V16.7998C20.0002 17.9199 20.0002 18.48 19.7822 18.9078C19.5905 19.2841 19.2842 19.5905 18.9079 19.7822C18.4805 20 17.9215 20 16.8036 20H7.19691C6.07899 20 5.5192 20 5.0918 19.7822C4.71547 19.5905 4.40973 19.2842 4.21799 18.9079C4 18.4801 4 17.9203 4 16.8002Z"
-                        stroke=""
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />{' '}
-                    </g>{' '}
-                  </g>
-                </svg>
+
+
+
+          <div className='rounded-lg shadow-md bg-green-400 h-12 flex stroke-gray-500 '>
+            <input onKeyDown={handleKeyDown} type='text' ref={newLabelName} className='bg-gray-200  py-1 px-3 placeholder-black  ' placeholder='New label title...'/>
+           <button onClick={()=>addLabel()} className='flex items-center justify-center w-full text-white font-bold'><p>Add</p></button>
           </div>
         </div>
       </div>

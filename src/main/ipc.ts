@@ -21,6 +21,50 @@ const init = () => {
   if (!fs.existsSync(`${app.getPath('appData')}/qplan/data/tasks.json`)) {
     fs.writeFileSync(`${app.getPath('appData')}/qplan/data/tasks.json`, '[]');
   }
+  if (!fs.existsSync(`${app.getPath('appData')}/qplan/data/labels.json`)) {
+    fs.writeFileSync(`${app.getPath('appData')}/qplan/data/labels.json`, '[]');
+  }
+  ipcMain.handle('get:labels',async(_,...args)=>{
+    const data = fs.readFileSync(
+      `${app.getPath('appData')}/qplan/data/labels.json`,
+      { encoding: 'utf8', flag: 'r' }
+    );
+
+    const parsed = JSON.parse(data);
+    let returnData;
+    parsed.forEach(element => {
+
+      if(element.project===args[0]){
+        console.log(element.labels);
+        returnData = element;
+      }
+    });
+    return returnData;
+  })
+  ipcMain.handle('post:labels',async(_,...args)=>{
+    const data = fs.readFileSync(
+      `${app.getPath('appData')}/qplan/data/labels.json`,
+      { encoding: 'utf8', flag: 'r' }
+    );
+
+    const parsed = JSON.parse(data);
+    let found=false;
+    parsed.forEach((element,i) => {
+      if(element.project===args[0]){
+        parsed[i].labels.push(args[1]);
+        found=true;
+      }
+    });
+    if(found===false){
+      parsed.push({"project":args[0],"labels":[args[1]]})
+    }
+
+    const newData = JSON.stringify(parsed,null, '\t');
+    fs.writeFileSync(
+      `${app.getPath('appData')}/qplan/data/labels.json`,
+      newData
+    );
+  })
 
   ipcMain.handle('get:github', async (_, ...args) => {
     const data = fs.readFileSync(
@@ -193,6 +237,10 @@ const init = () => {
     fs.writeFileSync(
       `${app.getPath('appData')}/qplan/data/config.json`,
       '{"github_username": "-1"}'
+    );
+    fs.writeFileSync(
+      `${app.getPath('appData')}/qplan/data/labels.json`,
+      '[]'
     );
   })
 };

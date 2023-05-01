@@ -8,6 +8,8 @@ export type Channels = 'ipc-example';
 
 //contextBridge.exposeInMainWorld('electron', electronHandler);
 contextBridge.exposeInMainWorld('electron',{
+  getLabels:async(projectName: string)=>ipcRenderer.invoke('get:labels',projectName),
+  postLabels:async(projectName: string,name:string)=>ipcRenderer.invoke('post:labels',projectName,name),
   getGithub: async () => ipcRenderer.invoke('get:github'),
   postGithub: async (id:any) => ipcRenderer.invoke('post:github',id),
   addIssues:async(...args: any)=>ipcRenderer.invoke('add:issues',...args),
